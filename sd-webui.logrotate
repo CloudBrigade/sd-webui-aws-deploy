@@ -1,0 +1,8 @@
+/var/log/sd-webui.log {
+  rotate 14
+  daily
+  compress
+  missingok
+  create 0640 ubuntu nobody
+  notifempty
+}

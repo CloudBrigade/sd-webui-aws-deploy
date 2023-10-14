@@ -1,0 +1,16 @@
+[Unit]
+After=network.target
+
+[Unit]
+Description=Script Daemon For Stable Diffusion WebUI
+
+[Service]
+Type=simple
+User=ubuntu
+Group=nobody
+ExecStart=/home/ubuntu/stable-diffusion-webui/webui.sh
+Restart=on-failure
+StandardOutput=file:%h/sd-webui.log
+
+[Install]
+WantedBy=default.target

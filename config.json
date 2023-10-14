@@ -1,0 +1,10 @@
+{
+    "listen": true,
+    "api": true,
+    "api-auth": "username:password",
+    "loglevel": 9,
+    "use-cpu": true,
+    "no-half": true,
+    "skip-torch-cuda-test": true,
+    "enable-insecure-extension-access": true
+}
