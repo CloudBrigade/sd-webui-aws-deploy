@@ -1,7 +1,7 @@
 # disable the restart dialogue and install several packages
 sudo sed -i "/#\$nrconf{restart} = 'i';/s/.*/\$nrconf{restart} = 'a';/" /etc/needrestart/needrestart.conf
 sudo apt-get update
-sudo apt install wget unzip git python3 python3-venv build-essential net-tools libgl-dev libgl1 libgl1-mesa-glx -y
+sudo apt install wget unzip git python3 python3-venv build-essential net-tools libgl-dev libgl1 libglib2.0-0 libgl1-mesa-glx -y
 
 # AWS official install method
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -38,13 +38,13 @@ cp v2-inference.yaml stable-diffusion-webui/models/Stable-diffusion/v2-1_512-ema
 sudo chown -R ubuntu:ubuntu stable-diffusion-webui/
 
 # Setup log rotation
-sudo cp sd-webui.logrotate /etc/logrotate.d/sd-webui
+sudo cp /home/ubuntu/sd-webui-aws-deploy/sd-webui.logrotate /etc/logrotate.d/sd-webui
 
 # Create a systemd service
-sudo cp sd-webui.service /etc/systemd/system
+sudo cp /home/ubuntu/sd-webui-aws-deploy/sd-webui.service /etc/systemd/system
 sudo systemctl daemon-reload
 sudo systemctl enable sd-webui.service
-sudo systemctl start sd-webui.service
+#   sudo systemctl start sd-webui.service
 
-# bash webui.sh --listen --api --api-auth=username:password --loglevel 9 --use-cpu all --no-half --skip-torch-cuda-test --enable-insecure-extension-    access
+nohup bash webui.sh --listen --api --api-auth=username:password --loglevel 9 --use-cpu all --no-half --skip-torch-cuda-test --enable-insecure-extension-access >> /var/log/sd-webui.log &
 

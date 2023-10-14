@@ -5,7 +5,7 @@ Resources:
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: sd-webui-sg2
+      GroupName: sd-webui-sg2-01
       GroupDescription: Security group for SD WebUI EC2 instance
       SecurityGroupIngress:
         - IpProtocol: tcp
@@ -21,7 +21,6 @@ Resources:
     Properties:
       InstanceType: dl1.24xlarge
       ImageId: ami-0bfc1f35a3b3bf002
-      KeyName: {{resolve:ssm:ec2-keypair-sd-webui:1}}
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:

@@ -33,7 +33,7 @@ You may need to login to the AWS Console to complete the following :
 * Create and IAM user with programmatic access for AWS CLI
 * Create a KeyPair "ec2-keypair-sd-webui" name in Parameter Store
 https://console.aws.amazon.com/systems-manager/parameters/
-* Subscribe to select EC2 images from the AMI Catalog (i.e. Habana) https://console.aws.amazon.com/ec2/home?#AMICatalog
+* Subscribe to select EC2 images from the Marketplace (i.e. Habana) https://aws.amazon.com/marketplace/pp/prodview-5jwcnmim6brvc?sr=0-2&ref_=beagle&applicationId=AWS-Marketplace-Console
 
 On your local workstation :
 

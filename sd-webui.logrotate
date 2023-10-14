@@ -3,6 +3,6 @@
   daily
   compress
   missingok
-  create 0640 ubuntu nobody
+  create 0640 ubuntu nogroup
   notifempty
 }
