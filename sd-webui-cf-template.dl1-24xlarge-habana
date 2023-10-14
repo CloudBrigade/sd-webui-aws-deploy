@@ -36,8 +36,8 @@ Resources:
         'Fn::Base64': |
             #!/bin/bash
             cd /home/ubuntu
-            git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git
-            # bash stable-diffusion-webui/setup.sh -y
+            git clone https://github.com/CloudBrigade/sd-webui-aws-deploy.git
+            bash sd-webui-aws-deploy/setup.sh -y
   MyEIP:
     Type: AWS::EC2::EIP
   MyEIPAssociation:
