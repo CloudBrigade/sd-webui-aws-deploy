@@ -6,8 +6,9 @@ from pathlib import Path
 
 import torch
 
-from optimum.habana.diffusers import GaudiDDIMScheduler, GaudiStableDiffusionPipeline
-from optimum.habana.utils import set_seed
+from diffusers import DDIMScheduler, StableDiffusionPipeline
+#from optimum.habana.diffusers import GaudiDDIMScheduler, GaudiStableDiffusionPipeline
+#from optimum.habana.utils import set_seed
 
 import modules.scripts as scripts
 
@@ -15,11 +16,12 @@ import gradio as gr
 from PIL import Image, ImageOps
 
 from modules import images
-# from modules.processing import process_images, Processed
+from modules.processing import process_images # Fast, default image processing
 from modules.processing import StableDiffusionProcessing, Processed
-from modules.shared import opts, cmd_opts, state
+# from modules import processing
+# from modules.shared import opts, cmd_opts, state
 
-def process_images_gaudi2(p):
+def process_images_gaudi2(p: StableDiffusionProcessing):
     
     # """this is the main loop that both txt2img and img2img use; it calls func_init once inside all the scopes and func_sample once per batch"""
     # if (mode == 0 and p.enable_hr):
@@ -45,28 +47,36 @@ def process_images_gaudi2(p):
     device = torch.device(target)
 
     model_name = "stabilityai/stable-diffusion-2-1-base"
-    scheduler = GaudiDDIMScheduler.from_pretrained(model_name, subfolder="scheduler")
+    # model_name = "runwayml/stable-diffusion-v1-5" # Crashes
+    # v1-5-pruned-emaonly
+    scheduler = DDIMScheduler.from_pretrained(model_name, subfolder="scheduler")
+    #scheduler = GaudiDDIMScheduler.from_pretrained(model_name, subfolder="scheduler")
 
-    infotexts = []
-    output_images = []
+    # infotexts = []
+    # output_images = []
 
-    basename = ""
+    # basename = ""
     # basename = Path(p.outpath_samples).stem
 
-    pipeline = GaudiStableDiffusionPipeline.from_pretrained(
+    #pipeline = GaudiStableDiffusionPipeline.from_pretrained(
+    pipeline = StableDiffusionPipeline.from_pretrained(
         model_name,
         scheduler=scheduler,
-        use_habana=True,
-        use_hpu_graphs=True,
-        gaudi_config="Habana/stable-diffusion-2",
-        torch_dtype=torch.bfloat16
+        #use_habana=True,
+        #use_hpu_graphs=True,
+        #gaudi_config="Habana/stable-diffusion-2",
+        #torch_dtype=torch.bfloat16
+        # torch_dtype="auto",
+        torch_dtype=torch.float16,
+        use_safetensors=True
     )
     #    use_hpu_graphs_for_inference=True,
     #    use_lazy_mode=True,
     #    num_images_per_prompt=10,
     #    batch_size=2,
 
-    # pipeline.to("hpu")
+    pipeline.to("cuda")
+    #pipeline.to("hpu")
     # pipeline.set_progress_bar_config(disable=True)
     # prompt = p.prompt
     # if prompt == "":
@@ -74,11 +84,11 @@ def process_images_gaudi2(p):
     # images = pipeline(prompt, num_inference_steps=50, guidance_scale=7.5, scheduler=scheduler, output_type="numpy")
     # images = images.images
     # for i in range(len(images)):
-    set_seed(p.seed)
+    #set_seed(p.seed)
 
     outputs = pipeline(
-        num_images_per_prompt=2,
-        batch_size=2,
+        num_images_per_prompt=10,
+        #batch_size=2,
         prompt=p.prompt,
         negative_prompt=p.negative_prompt,
         num_inference_steps=p.steps,
@@ -169,11 +179,12 @@ class Script(scripts.Script):
     def run(self, p):
 
         proc = process_images_gaudi2(p)
-        basename = "image"
+        # proc = process_images(p)
+        # basename = "image"
 
         # use the save_images method from images.py to save
         #for i in range(len(processed.images)):
-        #    images.save_image(image=processed.images[i], path="", basename=basename, prompt=p.prompt, p=p)
+        #    images.save_image(image=processed.images[i], path="outputs", basename=basename, prompt=p.prompt, p=p)
             # save_image(image, path, basename, seed=None, prompt=None, extension='png', info=None, short_filename=False, no_prompt=False, grid=False, pnginfo_section_name='parameters', p=None, existing_info=None, forced_filename=None, suffix="", save_to_dirs=None):
 
 
