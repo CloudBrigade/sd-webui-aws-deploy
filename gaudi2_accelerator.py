@@ -14,7 +14,8 @@ from modules.processing import process_images  # Fast, default image processing
 from modules.processing import StableDiffusionProcessing, Processed, create_infotext
 from modules.shared import state
 
-image_save_path = Path("outputs/txt2img-images")
+image_save_path = "outputs/txt2img-images"
+# image_save_path = Path("outputs/txt2img-images")
 os.makedirs(image_save_path, exist_ok=True)
 
 
@@ -39,8 +40,10 @@ def process_images_gaudi2(p: StableDiffusionProcessing) -> Processed:
 
     device = torch.device(target)
 
-    model_name = "stabilityai/stable-diffusion-2-1-base"
-    # model_name = "runwayml/stable-diffusion-v1-5" # Crashes
+    # model_name = "stabilityai/stable-diffusion-2-1-base"
+    # gaudi_config="Habana/stable-diffusion-2-base",
+    model_name = "runwayml/stable-diffusion-v1-5" # Crashes
+    gaudi_config="Habana/stable-diffusion",
 
     if device == "hpu":
         from optimum.habana.diffusers import (
@@ -57,8 +60,8 @@ def process_images_gaudi2(p: StableDiffusionProcessing) -> Processed:
             scheduler=scheduler,
             use_habana=True,
             use_hpu_graphs=True,
-            gaudi_config="Habana/stable-diffusion-2",
-            device_map="auto",
+            gaudi_config=gaudi_config,
+            #device_map="auto",
         )
         #    use_hpu_graphs_for_inference=True,
         #    use_lazy_mode=True,
@@ -69,7 +72,6 @@ def process_images_gaudi2(p: StableDiffusionProcessing) -> Processed:
         from diffusers import DDIMScheduler, StableDiffusionPipeline
 
         scheduler = DDIMScheduler.from_pretrained(model_name, subfolder="scheduler")
-        # pipeline = GaudiStableDiffusionPipeline.from_pretrained(
         pipeline = StableDiffusionPipeline.from_pretrained(
             model_name,
             scheduler=scheduler,
@@ -115,14 +117,14 @@ def process_images_gaudi2(p: StableDiffusionProcessing) -> Processed:
         p.iteration = n
 
     output = pipeline(
-        num_images_per_prompt=10,
-        # batch_size=2,
+        num_images_per_prompt=16,
+        # batch_size=4,
         prompt=p.prompt,
         negative_prompt=p.negative_prompt,
         num_inference_steps=p.steps,
         height=p.height,
         width=p.width,
-        eta=p.eta,
+        # eta=p.eta,
         output_type="pil",
         # styles=p.styles,
     )
