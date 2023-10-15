@@ -1,0 +1,12 @@
+    9  apt install pip
+   10  sudo apt install pip
+  141  apt install nvcc
+  142  sudo apt install nvcc
+  143  sudo apt install cuda
+  144  apt search cuda
+  145  sudo apt update
+  146  sudo apt install nvidia-cuda-toolkit nvidia-cuda-toolkit-gcc
+  150  sudo apt install ubuntu-drivers-common
+  152  sudo apt install aplay
+  153  sudo apt search aplay
+  172  history | grep apt > ../sd-webui-aws-deploy/history-apt.txt

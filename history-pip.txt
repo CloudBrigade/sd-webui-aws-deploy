@@ -1,0 +1,12 @@
+    6  pip install uvicorn
+    7  pip3 install uvicorn
+    8  python3 -m pip install uvicorn
+    9  apt install pip
+   10  sudo apt install pip
+   11  pip3 install uvicorn
+   71  pip install diffusers
+   92  pip list | grep diff
+   93  pip install diffusers gradio
+   94  pip install torch
+  138  pip install diffusers xformers
+  173  history | grep pip > ../sd-webui-aws-deploy/history-pip.txt
