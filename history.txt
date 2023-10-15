@@ -1,0 +1,7 @@
+  python3 -m pip install --upgrade-strategy eager 'optimum[habana]'
+  pip install python -m pip install git+https://github.com/HabanaAI/DeepSpeed.git@1.11.0
+  wget -nv https://vault.habana.ai/artifactory/gaudi-installer/latest/habanalabs-installer.sh
+  chmod +x habanalabs-installer.sh
+  ./habanalabs-installer.sh install --type dependencies
+  ./habanalabs-installer.sh install --type pytorch
+  python3.10 -m pip install --upgrade pip

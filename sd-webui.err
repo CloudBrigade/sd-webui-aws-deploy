@@ -1,0 +1,172 @@
+Restarting UI...
+Closing server running on port: 7860
+Running on local URL:  http://0.0.0.0:7860
+
+To create a public link, set `share=True` in `launch()`.
+Startup time: 0.7s (load scripts: 0.2s, create ui: 0.3s).
+Using HPU
+Loading pipeline components...: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 6/6 [00:01<00:00,  4.73it/s]
+[INFO|pipeline_utils.py:96] 2023-10-15 03:35:37,061 >> Enabled HPU graphs.
+[INFO|configuration_utils.py:305] 2023-10-15 03:35:37,149 >> loading configuration file gaudi_config.json from cache at /home/ubuntu/.cache/huggingface/hub/models--Habana--stable-diffusion-2/snapshots/0d373f24835b744dee7abaed683f9afeb00a2e7d/gaudi_config.json
+[INFO|configuration_utils.py:358] 2023-10-15 03:35:37,149 >> GaudiConfig {
+  "autocast_bf16_ops": null,
+  "autocast_fp32_ops": null,
+  "hmp_bf16_ops": [
+    "_convolution.deprecated",
+    "_convolution",
+    "conv1d",
+    "conv2d",
+    "conv3d",
+    "conv_tbc",
+    "conv_transpose1d",
+    "conv_transpose2d.input",
+    "conv_transpose3d.input",
+    "convolution",
+    "prelu",
+    "addmm",
+    "addmv",
+    "addr",
+    "matmul",
+    "einsum",
+    "mm",
+    "mv",
+    "silu",
+    "linear",
+    "addbmm",
+    "baddbmm",
+    "bmm",
+    "chain_matmul",
+    "linalg_multi_dot",
+    "layer_norm",
+    "group_norm"
+  ],
+  "hmp_fp32_ops": [
+    "acos",
+    "asin",
+    "cosh",
+    "erfinv",
+    "exp",
+    "expm1",
+    "log",
+    "log10",
+    "log2",
+    "log1p",
+    "reciprocal",
+    "rsqrt",
+    "sinh",
+    "tan",
+    "pow.Tensor_Scalar",
+    "pow.Tensor_Tensor",
+    "pow.Scalar",
+    "softplus",
+    "frobenius_norm",
+    "frobenius_norm.dim",
+    "nuclear_norm",
+    "nuclear_norm.dim",
+    "cosine_similarity",
+    "poisson_nll_loss",
+    "cosine_embedding_loss",
+    "nll_loss",
+    "nll_loss2d",
+    "hinge_embedding_loss",
+    "kl_div",
+    "l1_loss",
+    "smooth_l1_loss",
+    "huber_loss",
+    "mse_loss",
+    "margin_ranking_loss",
+    "multilabel_margin_loss",
+    "soft_margin_loss",
+    "triplet_margin_loss",
+    "multi_margin_loss",
+    "binary_cross_entropy_with_logits",
+    "dist",
+    "pdist",
+    "cdist",
+    "renorm",
+    "logsumexp"
+  ],
+  "hmp_is_verbose": false,
+  "hmp_opt_level": "O1",
+  "optimum_version": "1.13.2",
+  "transformers_version": "4.34.0",
+  "use_fused_adam": true,
+  "use_fused_clip_norm": true,
+  "use_habana_mixed_precision": false,
+  "use_torch_autocast": true
+}
+
+[WARNING|pipeline_utils.py:115] 2023-10-15 03:35:37,150 >> `use_habana_mixed_precision` or `use_torch_autocast` is True in the given Gaudi configuration but `torch_dtype=torch.blfloat16` was given. Disabling mixed precision and continuing in bf16 only.
+[INFO|pipeline_stable_diffusion.py:675] 2023-10-15 03:35:38,121 >> 1 prompt(s) received, 2 generation(s) per prompt, 2 sample(s) per batch, 1 total batch(es).
+[WARNING|pipeline_stable_diffusion.py:680] 2023-10-15 03:35:38,121 >> The first two iterations are slower so it is recommended to feed more batches.
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:26<00:00, 26.08s/it]
+[INFO|pipeline_stable_diffusion.py:815] 2023-10-15 03:36:04,235 >> Speed metrics: {'generation_runtime': 26.0815, 'generation_samples_per_second': 0.077, 'generation_steps_per_second': 0.038}
+*** API error: POST: http://35.155.150.45:7860/sdapi/v1/txt2img {'error': 'AttributeError', 'detail': '', 'body': '', 'errors': "'GaudiStableDiffusionPipelineOutput' object has no attribute 'js'"}
+    Traceback (most recent call last):
+      File "/home/ubuntu/.local/lib/python3.10/site-packages/anyio/streams/memory.py", line 98, in receive
+        return self.receive_nowait()
+      File "/home/ubuntu/.local/lib/python3.10/site-packages/anyio/streams/memory.py", line 93, in receive_nowait
+        raise WouldBlock
+    anyio.WouldBlock
+
+    During handling of the above exception, another exception occurred:
+
+    Traceback (most recent call last):
+      File "/home/ubuntu/.local/lib/python3.10/site-packages/starlette/middleware/base.py", line 78, in call_next
+        message = await recv_stream.receive()
+      File "/home/ubuntu/.local/lib/python3.10/site-packages/anyio/streams/memory.py", line 118, in receive
+        raise EndOfStream
+    anyio.EndOfStream
+
+    During handling of the above exception, another exception occurred:
+
+    Traceback (most recent call last):
+      File "/home/ubuntu/stable-diffusion-webui/modules/api/api.py", line 187, in exception_handling
+        return await call_next(request)
+      File "/home/ubuntu/.local/lib/python3.10/site-packages/starlette/middleware/base.py", line 84, in call_next
+        raise app_exc
+      File "/home/ubuntu/.local/lib/python3.10/site-packages/starlette/middleware/base.py", line 70, in coro
+        await self.app(scope, receive_or_disconnect, send_no_error)
+      File "/home/ubuntu/.local/lib/python3.10/site-packages/starlette/middleware/base.py", line 108, in __call__
+        response = await self.dispatch_func(request, call_next)
+      File "/home/ubuntu/stable-diffusion-webui/modules/api/api.py", line 151, in log_and_time
+        res: Response = await call_next(req)
+      File "/home/ubuntu/.local/lib/python3.10/site-packages/starlette/middleware/base.py", line 84, in call_next
+        raise app_exc
+      File "/home/ubuntu/.local/lib/python3.10/site-packages/starlette/middleware/base.py", line 70, in coro
+        await self.app(scope, receive_or_disconnect, send_no_error)
+      File "/home/ubuntu/.local/lib/python3.10/site-packages/starlette/middleware/cors.py", line 84, in __call__
+        await self.app(scope, receive, send)
+      File "/home/ubuntu/.local/lib/python3.10/site-packages/starlette/middleware/gzip.py", line 24, in __call__
+        await responder(scope, receive, send)
+      File "/home/ubuntu/.local/lib/python3.10/site-packages/starlette/middleware/gzip.py", line 44, in __call__
+        await self.app(scope, receive, self.send_with_gzip)
+      File "/home/ubuntu/.local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 79, in __call__
+        raise exc
+      File "/home/ubuntu/.local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+        await self.app(scope, receive, sender)
+      File "/home/ubuntu/.local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 21, in __call__
+        raise e
+      File "/home/ubuntu/.local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+        await self.app(scope, receive, send)
+      File "/home/ubuntu/.local/lib/python3.10/site-packages/starlette/routing.py", line 718, in __call__
+        await route.handle(scope, receive, send)
+      File "/home/ubuntu/.local/lib/python3.10/site-packages/starlette/routing.py", line 276, in handle
+        await self.app(scope, receive, send)
+      File "/home/ubuntu/.local/lib/python3.10/site-packages/starlette/routing.py", line 66, in app
+        response = await func(request)
+      File "/home/ubuntu/.local/lib/python3.10/site-packages/fastapi/routing.py", line 237, in app
+        raw_response = await run_endpoint_function(
+      File "/home/ubuntu/.local/lib/python3.10/site-packages/fastapi/routing.py", line 165, in run_endpoint_function
+        return await run_in_threadpool(dependant.call, **values)
+      File "/home/ubuntu/.local/lib/python3.10/site-packages/starlette/concurrency.py", line 41, in run_in_threadpool
+        return await anyio.to_thread.run_sync(func, *args)
+      File "/home/ubuntu/.local/lib/python3.10/site-packages/anyio/to_thread.py", line 33, in run_sync
+        return await get_asynclib().run_sync_in_worker_thread(
+      File "/home/ubuntu/.local/lib/python3.10/site-packages/anyio/_backends/_asyncio.py", line 877, in run_sync_in_worker_thread
+        return await future
+      File "/home/ubuntu/.local/lib/python3.10/site-packages/anyio/_backends/_asyncio.py", line 807, in run
+        result = context.run(func, *args)
+      File "/home/ubuntu/stable-diffusion-webui/modules/api/api.py", line 387, in text2imgapi
+        return models.TextToImageResponse(images=b64images, parameters=vars(txt2imgreq), info=processed.js())
+    AttributeError: 'GaudiStableDiffusionPipelineOutput' object has no attribute 'js'
