@@ -40,9 +40,9 @@ def process_images_gaudi2(p: StableDiffusionProcessing) -> Processed:
     device = torch.device(target)
     print(device)
 
-    # model_name = "stabilityai/stable-diffusion-2-1-base"
     # model_name = "./v1-5-pruned-emaonly"
     model_name = "runwayml/stable-diffusion-v1-5" # Crashes
+    model_name = "stabilityai/stable-diffusion-2-1-base"
 
     if target == "hpu":
         print("Using Gaudi Pipeline")
@@ -82,6 +82,7 @@ def process_images_gaudi2(p: StableDiffusionProcessing) -> Processed:
         pipeline = StableDiffusionPipeline.from_pretrained(
             model_name,
             scheduler=scheduler,
+            local_files_only=True,
             device_map="auto",
             # torch_dtype=torch.bfloat16,
             # torch_dtype=torch.float32,
@@ -92,7 +93,7 @@ def process_images_gaudi2(p: StableDiffusionProcessing) -> Processed:
         #    use_lazy_mode=True,
 
     pipeline.to(target)
-    # pipeline.set_progress_bar_config(disable=True)
+    pipeline.set_progress_bar_config()
 
     def infotext(iteration=0, position_in_batch=0):
         return create_infotext(
@@ -131,23 +132,24 @@ def process_images_gaudi2(p: StableDiffusionProcessing) -> Processed:
         num_inference_steps=p.steps,
         height=p.height,
         width=p.width,
-        # eta=p.eta,
         output_type="pil",
         # styles=p.styles,
+        return_dict=False
     )
 
-    # Save images
-    for i, image in enumerate(output.images):
-        image.save(image_save_path + f"image_{i+1}.png")
+    return
 
-    # image = Image.fromarray(output)
-    # images.save_image(image, p.outpath_samples, "", p.seeds[i], p.prompts[i], opts.samples_format, info=infotext(n, i), p=p)
+    image = pipeline.images[0]
 
-    text = infotext(n, i)
+    # text = infotext(n, i)
+    text = "text here"
     infotexts.append(text)
     image.info["parameters"] = text
     index_of_first_image = 0
     output_images.append(image)
+
+    # image = Image.fromarray(output)
+    # images.save_image(image, p.outpath_samples, "", p.seeds[i], p.prompts[i], opts.samples_format, info=infotext(n, i), p=p)
 
     result = Processed(
        p,
