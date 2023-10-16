@@ -41,9 +41,8 @@ def process_images_gaudi2(p: StableDiffusionProcessing) -> Processed:
     print(device)
 
     # model_name = "stabilityai/stable-diffusion-2-1-base"
-    model_name = "stabilityai/stable-diffusion"
     # model_name = "./v1-5-pruned-emaonly"
-    # model_name = "runwayml/stable-diffusion-v1-5" # Crashes
+    model_name = "runwayml/stable-diffusion-v1-5" # Crashes
 
     if target == "hpu":
         print("Using Gaudi Pipeline")
@@ -57,7 +56,7 @@ def process_images_gaudi2(p: StableDiffusionProcessing) -> Processed:
         scheduler = GaudiDDIMScheduler.from_pretrained(
             model_name, subfolder="scheduler"
         )
-        # pipeline = StableDiffusionPipeline.from_single_file(
+        # pipeline = GaudiStableDiffusionPipeline.from_single_file(
         pipeline = GaudiStableDiffusionPipeline.from_pretrained(
             model_name,
             scheduler=scheduler,
@@ -79,7 +78,7 @@ def process_images_gaudi2(p: StableDiffusionProcessing) -> Processed:
         scheduler = DDIMScheduler.from_pretrained(
             model_name, subfolder="scheduler"
         )
-        # pipeline = GaudiStableDiffusionPipeline.from_pretrained(
+        # pipeline = StableDiffusionPipeline.from_pretrained(
         pipeline = StableDiffusionPipeline.from_pretrained(
             model_name,
             scheduler=scheduler,
@@ -87,8 +86,8 @@ def process_images_gaudi2(p: StableDiffusionProcessing) -> Processed:
             # torch_dtype=torch.bfloat16,
             # torch_dtype=torch.float32,
             # torch_dtype=auto, # errors out
-            # torch_dtype=torch.float16,
-            # use_safetensors=True
+            torch_dtype=torch.float16,
+            use_safetensors=True
         )
         #    use_lazy_mode=True,
 
