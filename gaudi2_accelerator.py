@@ -14,8 +14,7 @@ from modules.processing import process_images  # Fast, default image processing
 from modules.processing import StableDiffusionProcessing, Processed, create_infotext
 from modules.shared import state
 
-image_save_path = "outputs/txt2img-images"
-# image_save_path = Path("outputs/txt2img-images")
+image_save_path = Path("outputs/txt2img-images")
 os.makedirs(image_save_path, exist_ok=True)
 
 
@@ -39,13 +38,16 @@ def process_images_gaudi2(p: StableDiffusionProcessing) -> Processed:
         print("Using CPU")
 
     device = torch.device(target)
+    print(device)
 
     # model_name = "stabilityai/stable-diffusion-2-1-base"
-    # gaudi_config="Habana/stable-diffusion-2-base",
-    model_name = "runwayml/stable-diffusion-v1-5" # Crashes
-    gaudi_config="Habana/stable-diffusion",
+    model_name = "stabilityai/stable-diffusion"
+    # model_name = "./v1-5-pruned-emaonly"
+    # model_name = "runwayml/stable-diffusion-v1-5" # Crashes
 
-    if device == "hpu":
+    if target == "hpu":
+        print("Using Gaudi Pipeline")
+
         from optimum.habana.diffusers import (
             GaudiDDIMScheduler,
             GaudiStableDiffusionPipeline,
@@ -55,23 +57,29 @@ def process_images_gaudi2(p: StableDiffusionProcessing) -> Processed:
         scheduler = GaudiDDIMScheduler.from_pretrained(
             model_name, subfolder="scheduler"
         )
+        # pipeline = StableDiffusionPipeline.from_single_file(
         pipeline = GaudiStableDiffusionPipeline.from_pretrained(
             model_name,
             scheduler=scheduler,
             use_habana=True,
             use_hpu_graphs=True,
-            gaudi_config=gaudi_config,
-            #device_map="auto",
+            gaudi_config="Habana/stable-diffusion-2",
+            device_map="auto",
         )
         #    use_hpu_graphs_for_inference=True,
         #    use_lazy_mode=True,
-        #    num_images_per_prompt=10,
-        #    batch_size=2,
         set_seed(p.seed)
     else:
-        from diffusers import DDIMScheduler, StableDiffusionPipeline
+        print("Using SD Pipeline")
+        from diffusers import (
+            DDIMScheduler,
+            StableDiffusionPipeline,
+        )
 
-        scheduler = DDIMScheduler.from_pretrained(model_name, subfolder="scheduler")
+        scheduler = DDIMScheduler.from_pretrained(
+            model_name, subfolder="scheduler"
+        )
+        # pipeline = GaudiStableDiffusionPipeline.from_pretrained(
         pipeline = StableDiffusionPipeline.from_pretrained(
             model_name,
             scheduler=scheduler,
@@ -83,10 +91,8 @@ def process_images_gaudi2(p: StableDiffusionProcessing) -> Processed:
             # use_safetensors=True
         )
         #    use_lazy_mode=True,
-        #    num_images_per_prompt=10,
-        #    batch_size=2,
 
-    pipeline.to(device)
+    pipeline.to(target)
     # pipeline.set_progress_bar_config(disable=True)
 
     def infotext(iteration=0, position_in_batch=0):
@@ -116,9 +122,11 @@ def process_images_gaudi2(p: StableDiffusionProcessing) -> Processed:
     for n in range(p.n_iter):
         p.iteration = n
 
+    print ("Running Pipeline")
+
     output = pipeline(
-        num_images_per_prompt=16,
-        # batch_size=4,
+        num_images_per_prompt=10,
+        # batch_size=2,
         prompt=p.prompt,
         negative_prompt=p.negative_prompt,
         num_inference_steps=p.steps,
