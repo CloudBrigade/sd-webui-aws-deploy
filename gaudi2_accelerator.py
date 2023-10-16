@@ -42,7 +42,7 @@ def process_images_gaudi2(p: StableDiffusionProcessing) -> Processed:
 
     # model_name = "./v1-5-pruned-emaonly"
     model_name = "runwayml/stable-diffusion-v1-5" # Crashes
-    model_name = "stabilityai/stable-diffusion-2-1-base"
+    # model_name = "stabilityai/stable-diffusion-2-1-base"
 
     if target == "hpu":
         print("Using Gaudi Pipeline")
@@ -52,7 +52,6 @@ def process_images_gaudi2(p: StableDiffusionProcessing) -> Processed:
             GaudiStableDiffusionPipeline,
         )
         from optimum.habana.utils import set_seed
-
         scheduler = GaudiDDIMScheduler.from_pretrained(
             model_name, subfolder="scheduler"
         )
@@ -62,19 +61,21 @@ def process_images_gaudi2(p: StableDiffusionProcessing) -> Processed:
             scheduler=scheduler,
             use_habana=True,
             use_hpu_graphs=True,
-            gaudi_config="Habana/stable-diffusion-2",
-            device_map="auto",
+            # gaudi_config="Habana/stable-diffusion-2",
+            gaudi_config="Habana/stable-diffusion",
+            torch_dtype=torch.bfloat16,
+            # device_map="auto",
+            use_hpu_graphs_for_inference=True,
         )
-        #    use_hpu_graphs_for_inference=True,
         #    use_lazy_mode=True,
-        set_seed(p.seed)
+        #set_seed(p.seed)
+        set_seed(42)
     else:
         print("Using SD Pipeline")
         from diffusers import (
             DDIMScheduler,
             StableDiffusionPipeline,
         )
-
         scheduler = DDIMScheduler.from_pretrained(
             model_name, subfolder="scheduler"
         )
@@ -84,16 +85,14 @@ def process_images_gaudi2(p: StableDiffusionProcessing) -> Processed:
             scheduler=scheduler,
             local_files_only=True,
             device_map="auto",
-            # torch_dtype=torch.bfloat16,
             # torch_dtype=torch.float32,
-            # torch_dtype=auto, # errors out
             torch_dtype=torch.float16,
             use_safetensors=True
         )
         #    use_lazy_mode=True,
 
     pipeline.to(target)
-    pipeline.set_progress_bar_config()
+    # pipeline.set_progress_bar_config()
 
     def infotext(iteration=0, position_in_batch=0):
         return create_infotext(
@@ -125,8 +124,8 @@ def process_images_gaudi2(p: StableDiffusionProcessing) -> Processed:
     print ("Running Pipeline")
 
     output = pipeline(
-        num_images_per_prompt=10,
-        # batch_size=2,
+        num_images_per_prompt=8,
+        batch_size=4,
         prompt=p.prompt,
         negative_prompt=p.negative_prompt,
         num_inference_steps=p.steps,
