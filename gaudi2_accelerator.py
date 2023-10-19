@@ -41,12 +41,18 @@ def process_images_gaudi2(p: StableDiffusionProcessing) -> Processed:
     print(device)
 
     # model_name = "./v1-5-pruned-emaonly"
-    model_name = "runwayml/stable-diffusion-v1-5" # Crashes
+    model_name = "runwayml/stable-diffusion-v1-5"
+    gaudi_config="Habana/stable-diffusion"
     # model_name = "stabilityai/stable-diffusion-2-1-base"
+    # gaudi_config="Habana/stable-diffusion-2"
+
+    StableDiffusionPipeline.save_pretrained(
+        model_name,
+    )
 
     if target == "hpu":
         print("Using Gaudi Pipeline")
-
+        # Can this increase performance? https://docs.habana.ai/en/latest/PyTorch/DeepSpeed/Inference_Using_DeepSpeed.html
         from optimum.habana.diffusers import (
             GaudiDDIMScheduler,
             GaudiStableDiffusionPipeline,
@@ -61,17 +67,19 @@ def process_images_gaudi2(p: StableDiffusionProcessing) -> Processed:
             scheduler=scheduler,
             use_habana=True,
             use_hpu_graphs=True,
-            # gaudi_config="Habana/stable-diffusion-2",
-            gaudi_config="Habana/stable-diffusion",
+            gaudi_config=gaudi_config
             torch_dtype=torch.bfloat16,
+            use_lazy_mode=True,
             # device_map="auto",
             use_hpu_graphs_for_inference=True,
+            local_files_only=True,
         )
-        #    use_lazy_mode=True,
+        pipeline.batch_size = 4
+
         #set_seed(p.seed)
         set_seed(42)
     else:
-        print("Using SD Pipeline")
+        print("Using Default SD Pipeline")
         from diffusers import (
             DDIMScheduler,
             StableDiffusionPipeline,
@@ -79,7 +87,6 @@ def process_images_gaudi2(p: StableDiffusionProcessing) -> Processed:
         scheduler = DDIMScheduler.from_pretrained(
             model_name, subfolder="scheduler"
         )
-        # pipeline = StableDiffusionPipeline.from_pretrained(
         pipeline = StableDiffusionPipeline.from_pretrained(
             model_name,
             scheduler=scheduler,
@@ -89,10 +96,8 @@ def process_images_gaudi2(p: StableDiffusionProcessing) -> Processed:
             torch_dtype=torch.float16,
             use_safetensors=True
         )
-        #    use_lazy_mode=True,
 
     pipeline.to(target)
-    # pipeline.set_progress_bar_config()
 
     def infotext(iteration=0, position_in_batch=0):
         return create_infotext(
@@ -109,23 +114,22 @@ def process_images_gaudi2(p: StableDiffusionProcessing) -> Processed:
     infotexts = []
     outputs = []
     comments = {}
-    devices.torch_gc()
+    # devices.torch_gc()
 
-    with devices.autocast():
-        p.init(p.all_prompts, p.all_seeds, p.all_subseeds)
+    # with devices.autocast():
+    #     p.init(p.all_prompts, p.all_seeds, p.all_subseeds)
 
-    if state.job_count == -1:
-        state.job_count = p.n_iter
+    # if state.job_count == -1:
+    #     state.job_count = p.n_iter
 
-    extra_network_data = None
-    for n in range(p.n_iter):
-        p.iteration = n
+    # extra_network_data = None
+    # for n in range(p.n_iter):
+    #     p.iteration = n
 
     print ("Running Pipeline")
 
     output = pipeline(
         num_images_per_prompt=8,
-        batch_size=4,
         prompt=p.prompt,
         negative_prompt=p.negative_prompt,
         num_inference_steps=p.steps,
@@ -138,30 +142,30 @@ def process_images_gaudi2(p: StableDiffusionProcessing) -> Processed:
 
     return
 
-    image = pipeline.images[0]
+    # image = pipeline.images[0]
 
-    # text = infotext(n, i)
-    text = "text here"
-    infotexts.append(text)
-    image.info["parameters"] = text
-    index_of_first_image = 0
-    output_images.append(image)
+    # # text = infotext(n, i)
+    # text = "text here"
+    # infotexts.append(text)
+    # image.info["parameters"] = text
+    # index_of_first_image = 0
+    # output_images.append(image)
 
-    # image = Image.fromarray(output)
-    # images.save_image(image, p.outpath_samples, "", p.seeds[i], p.prompts[i], opts.samples_format, info=infotext(n, i), p=p)
+    # # image = Image.fromarray(output)
+    # # images.save_image(image, p.outpath_samples, "", p.seeds[i], p.prompts[i], opts.samples_format, info=infotext(n, i), p=p)
 
-    result = Processed(
-       p,
-       images_list=output_images,
-       seed=p.all_seeds[0],
-       info=infotext(),
-       comments="".join(f"{comment}\n" for comment in comments),
-       subseed=p.all_subseeds[0],
-       index_of_first_image=index_of_first_image,
-       infotexts=infotexts,
-    )
+    # result = Processed(
+    #    p,
+    #    images_list=output_images,
+    #    seed=p.all_seeds[0],
+    #    info=infotext(),
+    #    comments="".join(f"{comment}\n" for comment in comments),
+    #    subseed=p.all_subseeds[0],
+    #    index_of_first_image=index_of_first_image,
+    #    infotexts=infotexts,
+    # )
 
-    return result
+    # return result
 
 
 class Script(scripts.Script):
